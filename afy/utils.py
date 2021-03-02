@@ -145,8 +145,7 @@ def pad_img(img, target_size, default_pad=0):
         pad_w += int(sw * (w / h) - sw) // 2
     else:
         pad_h += int(sh * (h / w) - sh) // 2
-    out = np.pad(img, [[pad_h, pad_h], [pad_w, pad_w], [0,0]], 'constant')
-    return out
+    return np.pad(img, [[pad_h, pad_h], [pad_w, pad_w], [0,0]], 'constant')
 
 
 def resize(img, size, version='cv'):
