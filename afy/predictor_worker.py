@@ -103,7 +103,7 @@ class PredictorWorker():
         predictor_args = ()
         timing = AccumDict()
         log = Logger('./var/log/predictor_worker.log', verbose=opt.verbose)
-        
+
         try:
             while worker_alive.value:
                 tt = TicToc()
@@ -168,15 +168,13 @@ class PredictorWorker():
                         send_queue.put((method, data_send), block=False)
                     except queue.Full:
                         log("send_queue full")
-                        pass
-
                 Once(timing, log, per=1)
         except KeyboardInterrupt:
             log("predictor_worker: user interrupt", important=True)
         except Exception as e:
             log("predictor_worker error", important=True)
             traceback.print_exc()
-    
+
         worker_alive.value = 0
         log("predictor_worker exit", important=True)
 

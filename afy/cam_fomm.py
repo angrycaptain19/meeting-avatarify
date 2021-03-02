@@ -19,11 +19,10 @@ log = Tee('./var/log/cam_fomm.log')
 # Where to split an array from face_alignment to separate each landmark
 LANDMARK_SLICE_ARRAY = np.array([17, 22, 27, 31, 36, 42, 48, 60])
 
-if _platform == 'darwin':
-    if not opt.is_client:
-        info('\nOnly remote GPU mode is supported for Mac (use --is-client and --connect options to connect to the server)')
-        info('Standalone version will be available lately!\n')
-        exit()
+if _platform == 'darwin' and not opt.is_client:
+    info('\nOnly remote GPU mode is supported for Mac (use --is-client and --connect options to connect to the server)')
+    info('Standalone version will be available lately!\n')
+    exit()
 
 
 def is_new_frame_better(source, driving, predictor):
@@ -245,11 +244,11 @@ if __name__ == "__main__":
         else:
             enable_vcam = False
             # log("Virtual camera is supported only on Linux.")
-        
+
         # if not enable_vcam:
             # log("Virtual camera streaming will be disabled.")
 
-    cur_ava = 0    
+    cur_ava = 0
     avatar = None
     change_avatar(predictor, avatars[cur_ava])
     passthrough = False
@@ -301,11 +300,10 @@ if __name__ == "__main__":
 
             frame = resize(frame, (IMG_SIZE, IMG_SIZE))[..., :3]
 
-            if find_keyframe:
-                if is_new_frame_better(avatar, frame, predictor):
-                    log("Taking new frame!")
-                    green_overlay = True
-                    predictor.reset_frames()
+            if find_keyframe and is_new_frame_better(avatar, frame, predictor):
+                log("Taking new frame!")
+                green_overlay = True
+                predictor.reset_frames()
 
             timing['preproc'] = tt.toc()
 
@@ -321,7 +319,7 @@ if __name__ == "__main__":
                 out = None
 
             tt.tic()
-            
+
             key = cv2.waitKey(1)
 
             if cv2.getWindowProperty('cam', cv2.WND_PROP_VISIBLE) < 1.0:
@@ -375,7 +373,7 @@ if __name__ == "__main__":
                 if not is_calibrated:
                     cv2.namedWindow('avatarify', cv2.WINDOW_GUI_NORMAL)
                     cv2.moveWindow('avatarify', 600, 250)
-                
+
                 is_calibrated = True
                 show_landmarks = False
             elif key == ord('z'):
@@ -429,10 +427,10 @@ if __name__ == "__main__":
                 draw_face_landmarks(preview_frame, avatar_kp, (200, 20, 10))
                 frame_kp = predictor.get_frame_kp(frame)
                 draw_face_landmarks(preview_frame, frame_kp)
-            
+
             if preview_flip:
                 preview_frame = cv2.flip(preview_frame, 1)
-                
+
             if green_overlay:
                 green_alpha = 0.8
                 overlay = preview_frame.copy()
@@ -440,7 +438,7 @@ if __name__ == "__main__":
                 preview_frame = cv2.addWeighted( preview_frame, green_alpha, overlay, 1.0 - green_alpha, 0.0)
 
             timing['postproc'] = tt.toc()
-                
+
             if find_keyframe:
                 preview_frame = cv2.putText(preview_frame, display_string, (10, 220), 0, 0.5 * IMG_SIZE / 256, (255, 255, 255), 1)
 

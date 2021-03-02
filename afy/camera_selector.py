@@ -26,7 +26,7 @@ def query_cameras(n_cams):
             cap.release()
             continue
 
-        for i in range(10):
+        for _ in range(10):
             ret, frame = cap.read()
 
         cam_frames[camid] = frame.copy()
